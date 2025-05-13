@@ -119,4 +119,4 @@ def render_results(results):
                 # Vector store data is in-memory, so no need to clean up files
                 # Clear session state and rerun
                 del st.session_state.doc_id
-                st.erun()
+                st.rerun()

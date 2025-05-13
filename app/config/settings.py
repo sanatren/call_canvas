@@ -13,11 +13,15 @@ from dotenv import load_dotenv
 # Load environment variables from .env file if it exists
 load_dotenv()
 
+# Check if running on Streamlit Cloud (it sets this environment variable)
+IS_STREAMLIT_CLOUD = os.environ.get('STREAMLIT_SHARING_MODE') == 'streamlit'
+
 # Directory settings
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 UPLOAD_DIRECTORY = os.path.join(BASE_DIR, "data", "uploads")
-DOCUMENTS_STORE_PATH = os.path.join(BASE_DIR, "data", "documents")
-CHROMA_PERSIST_DIRECTORY = os.path.join(BASE_DIR, "data", "vectorstore")
+DOCUMENTS_STORE_PATH = "/tmp/documents" if IS_STREAMLIT_CLOUD else os.path.join(BASE_DIR, "data", "documents")
+# Use /tmp directory on Streamlit Cloud for writable storage
+CHROMA_PERSIST_DIRECTORY = "/tmp/vectorstore" if IS_STREAMLIT_CLOUD else os.path.join(BASE_DIR, "data", "vectorstore")
 
 # Create directories if they don't exist
 for directory in [UPLOAD_DIRECTORY, DOCUMENTS_STORE_PATH, CHROMA_PERSIST_DIRECTORY]:
