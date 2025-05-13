@@ -78,7 +78,7 @@ def main():
                     
                     st.session_state.doc_id = doc_id
                     st.success("Document processed successfully!")
-                    st.experimental_rerun()
+                    st.rerun()
                 except Exception as e:
                     st.error(f"Error processing document: {str(e)}")
     else:
@@ -118,7 +118,7 @@ def main():
                     shutil.rmtree(vector_dir, ignore_errors=True)
                 # Clear session state and rerun
                 del st.session_state.doc_id
-                st.experimental_rerun()
+                st.rerun()
 
 if __name__ == "__main__":
     main() 
