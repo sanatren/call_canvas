@@ -11,8 +11,17 @@ class EmbeddingsManager:
     """Manages document embeddings and vector storage."""
     
     def __init__(self):
-        # Initialize the embeddings model
-        self.embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+        # Initialize the embeddings model with explicit settings to avoid meta tensor errors
+        try:
+            self.embeddings = HuggingFaceEmbeddings(
+                model_name=EMBEDDING_MODEL,
+                model_kwargs={"device": "cpu"},
+                encode_kwargs={"device": "cpu", "normalize_embeddings": True}
+            )
+        except Exception as e:
+            # Fallback to the simplest initialization if any error occurs
+            print(f"Warning: Failed to initialize embeddings with custom settings: {e}")
+            self.embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
         
         # Ensure persistence directory exists
         os.makedirs(CHROMA_PERSIST_DIRECTORY, exist_ok=True)
