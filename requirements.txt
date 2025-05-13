@@ -9,4 +9,5 @@ pypdf
 huggingface-hub
 openai
 tiktoken
-PyMuPDF 
+PyMuPDF
+protobuf<=3.20.3 
