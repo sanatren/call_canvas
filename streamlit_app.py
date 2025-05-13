@@ -1,5 +1,10 @@
 import streamlit as st
 import os
+import sys
+
+# Add the current directory to path to find the app module
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from app.core.document_processor import DocumentProcessor
 from app.core.query_engine import QueryEngine
 from app.components.sidebar import render_sidebar
@@ -55,7 +60,7 @@ def main():
         # File upload section when no document is loaded
         st.title("CallCanvas")
         st.subheader("Upload a transcript (PDF, max 10MB)")
-        uploaded_file = st.file_uploader("", type=['pdf'])
+        uploaded_file = st.file_uploader("", type=['pdf'], label_visibility="collapsed")
         
         if uploaded_file:
             with st.spinner("Processing document..."):

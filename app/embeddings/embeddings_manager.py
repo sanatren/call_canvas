@@ -4,7 +4,6 @@ import os
 from langchain.schema import Document
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from chromadb.config import Settings
 
 from app.config.settings import EMBEDDING_MODEL, CHROMA_PERSIST_DIRECTORY
 
@@ -73,15 +72,11 @@ class EmbeddingsManager:
         Returns:
             Chroma vector store
         """
-        # Use DuckDB+Parquet backend to avoid sqlite3 version issues
-        client_settings = Settings(
-            chroma_db_impl="duckdb+parquet",
-            persist_directory=CHROMA_PERSIST_DIRECTORY
-        )
+        # Create or load existing vector store, using in-memory storage 
+        # since we don't need persistence between sessions
         vector_store = Chroma(
             collection_name=collection_name,
             embedding_function=self.embeddings,
-            persist_directory=CHROMA_PERSIST_DIRECTORY,
-            client_settings=client_settings
+            persist_directory=None  # Use in-memory storage instead of SQLite
         )
         return vector_store 
