@@ -13,3 +13,4 @@ PyMuPDF
 protobuf==3.20.3
 duckdb
 hnswlib
+pysqlite3-binary
