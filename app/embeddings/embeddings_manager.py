@@ -72,10 +72,10 @@ class EmbeddingsManager:
         Returns:
             Chroma vector store
         """
-        # Force in-memory storage to avoid SQLite compatibility issues
+        # With pysqlite3 fix, we can now use persistent storage
         vector_store = Chroma(
             collection_name=collection_name,
             embedding_function=self.embeddings,
-            persist_directory=None  # Use in-memory storage instead of SQLite
+            persist_directory=CHROMA_PERSIST_DIRECTORY
         )
         return vector_store

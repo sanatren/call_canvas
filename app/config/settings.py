@@ -1,3 +1,12 @@
+# ⚠️ SQLite Compatibility Fix ⚠️
+# Swap the stdlib sqlite3 lib with the pysqlite3 package
+try:
+    __import__('pysqlite3')
+    import sys
+    sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+except ImportError:
+    pass  # fallback to built-in sqlite3
+
 import os
 from dotenv import load_dotenv
 
