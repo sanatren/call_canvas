@@ -10,5 +10,6 @@ huggingface-hub
 openai
 tiktoken
 PyMuPDF
-protobuf<=3.20.3
-duckdb 
+protobuf==3.20.3
+duckdb
+hnswlib

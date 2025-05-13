@@ -110,16 +110,13 @@ def render_results(results):
         # Clear document button at the bottom (cleanup metadata and vectorstore)
         if st.button("Clear document", key="clear_doc_button"):
             if 'doc_id' in st.session_state:
-                import os, shutil
-                from app.config.settings import DOCUMENTS_STORE_PATH, CHROMA_PERSIST_DIRECTORY
+                import os
+                from app.config.settings import DOCUMENTS_STORE_PATH
                 # Remove metadata JSON
                 meta_file = os.path.join(DOCUMENTS_STORE_PATH, f"{st.session_state['doc_id']}.json")
                 if os.path.exists(meta_file):
                     os.remove(meta_file)
-                # Remove vector store data for this document
-                vector_dir = os.path.join(CHROMA_PERSIST_DIRECTORY, st.session_state['doc_id'])
-                if os.path.exists(vector_dir):
-                    shutil.rmtree(vector_dir, ignore_errors=True)
+                # Vector store data is in-memory, so no need to clean up files
                 # Clear session state and rerun
                 del st.session_state.doc_id
-                st.experimental_rerun()
+                st.erun()
