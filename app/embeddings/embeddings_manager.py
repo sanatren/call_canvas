@@ -4,6 +4,7 @@ import os
 from langchain.schema import Document
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
+import chromadb
 
 from app.config.settings import EMBEDDING_MODEL, CHROMA_PERSIST_DIRECTORY
 
@@ -14,8 +15,8 @@ class EmbeddingsManager:
         # Initialize the embeddings model
         self.embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
         
-        # Ensure persistence directory exists
-        os.makedirs(CHROMA_PERSIST_DIRECTORY, exist_ok=True)
+        # Create an in-memory client
+        self.client = chromadb.Client()
     
     def add_documents(self, doc_id: str, documents: List[Document]) -> None:
         """
@@ -72,11 +73,10 @@ class EmbeddingsManager:
         Returns:
             Chroma vector store
         """
-        # Create or load existing vector store, using in-memory storage 
-        # since we don't need persistence between sessions
+        # Create a strictly in-memory vector store with no persistence
         vector_store = Chroma(
             collection_name=collection_name,
             embedding_function=self.embeddings,
-            persist_directory=None  # Use in-memory storage instead of SQLite
+            client=self.client  # Use in-memory client with no persistence
         )
         return vector_store 

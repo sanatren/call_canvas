@@ -1,3 +1,9 @@
+# Set protobuf implementation to pure Python to avoid descriptor issues
+import os
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+# Force Chroma to use in-memory implementation
+os.environ["CHROMA_DB_IMPL"] = "memory"
+
 import streamlit as st
 import os
 import sys

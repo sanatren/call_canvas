@@ -12,12 +12,8 @@ from app.embeddings.embeddings_manager import EmbeddingsManager
 from app.utils.metadata_extractor import extract_metadata
 from app.config.settings import CHUNK_SIZE, CHUNK_OVERLAP
 
-# Try to import PyMuPDF for better PDF text extraction
-try:
-    import fitz
-    PYMUPDF_AVAILABLE = True
-except ImportError:
-    PYMUPDF_AVAILABLE = False
+# Import PyMuPDF but use langchain extraction for compatibility
+import fitz
 
 class DocumentProcessor:
     """Processes earnings call documents (PDF)."""
@@ -67,11 +63,8 @@ class DocumentProcessor:
         Returns:
             List of document chunks with metadata
         """
-        # Choose extraction method based on available libraries
-        if PYMUPDF_AVAILABLE:
-            processed_docs = self._extract_with_pymupdf(file_path)
-        else:
-            processed_docs = self._extract_with_langchain(file_path)
+        # Use simpler LangChain extraction for better compatibility
+        processed_docs = self._extract_with_langchain(file_path)
             
         # Split into chunks with metadata preservation
         text_splitter = RecursiveCharacterTextSplitter(
