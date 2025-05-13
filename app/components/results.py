@@ -79,13 +79,8 @@ def render_results(results):
                 speaker_display = speaker_name
                 
             st.markdown("**Speaker:**")
-            
             # Page number
             st.markdown("**Page:**")
-            
-            # Line number
-            st.markdown("**Line:**")
-            
             # Time information (if available)
             if citation.get("time"):
                 st.markdown("**Time:**")
@@ -93,15 +88,9 @@ def render_results(results):
         with col2:
             # Speaker value
             st.markdown(f"{speaker_display}")
-            
             # Page value
             page_num = citation.get("page", "")
             st.markdown(f"{page_num}")
-            
-            # Line value
-            line_num = citation.get("line_number", "")
-            st.markdown(f"{line_num}")
-            
             # Time value (if available)
             if citation.get("time"):
                 st.markdown(f"{citation['time']}")
@@ -117,3 +106,20 @@ def render_results(results):
                 st.write(f"**Date:** {doc_info['date']}")
             if doc_info.get("quarter"):
                 st.write(f"**Period:** {doc_info['quarter']}")
+        
+        # Clear document button at the bottom (cleanup metadata and vectorstore)
+        if st.button("Clear document", key="clear_doc_button"):
+            if 'doc_id' in st.session_state:
+                import os, shutil
+                from app.config.settings import DOCUMENTS_STORE_PATH, CHROMA_PERSIST_DIRECTORY
+                # Remove metadata JSON
+                meta_file = os.path.join(DOCUMENTS_STORE_PATH, f"{st.session_state['doc_id']}.json")
+                if os.path.exists(meta_file):
+                    os.remove(meta_file)
+                # Remove vector store data for this document
+                vector_dir = os.path.join(CHROMA_PERSIST_DIRECTORY, st.session_state['doc_id'])
+                if os.path.exists(vector_dir):
+                    shutil.rmtree(vector_dir, ignore_errors=True)
+                # Clear session state and rerun
+                del st.session_state.doc_id
+                st.experimental_rerun()

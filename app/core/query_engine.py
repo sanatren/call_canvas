@@ -100,14 +100,13 @@ class QueryEngine:
             text: Answer text potentially containing citation
             
         Returns:
-            Dictionary with page and line information if found, None otherwise
+            Dictionary with page information if found, None otherwise
         """
-        # Look for citation patterns like (Page 7) or (Page 7, Lines 2-3)
-        citation_match = re.search(r'\(Page\s+(\d+)(?:,\s*Lines?\s+(\d+)(?:-\d+)?)?\)', text)
+        # Look for citation pattern like (Page 7)
+        citation_match = re.search(r'\(Page\s+(\d+)\)', text)
         if citation_match:
             page = int(citation_match.group(1))
-            line = int(citation_match.group(2)) if citation_match.group(2) else 1
-            return {"page": page, "line_number": line}
+            return {"page": page}
         return None
     
     def _format_results(self, answer: str, source_docs: List[Document], 
@@ -137,15 +136,9 @@ class QueryEngine:
             # Use extracted citation if available (from answer text), otherwise use metadata from retrieved documents
             if extracted_citation:
                 page = extracted_citation.get("page")
-                line_number = extracted_citation.get("line_number")
-                
-                # Validate page number against available metadata
-                if page > metadata.get("total_pages", 1000):  # Use a high number as fallback
-                    page = metadata.get("page", 1)
             else:
                 # Use metadata from the best matching document
                 page = metadata.get("page", 1)
-                line_number = metadata.get("line_number", 1)
             
             # Get speaker information
             speaker_name = metadata.get("speaker_name", "Narrator")
@@ -158,7 +151,6 @@ class QueryEngine:
             citation = {
                 "text": quote,
                 "page": page,
-                "line_number": line_number,
                 "speaker_name": speaker_name,
                 "speaker_role": speaker_role,
                 "time": time_stamp,

@@ -97,8 +97,19 @@ def main():
         # Add button to clear current document
         if st.button("Clear document", key="clear_doc"):
             if 'doc_id' in st.session_state:
+                import os, shutil
+                from app.config.settings import DOCUMENTS_STORE_PATH, CHROMA_PERSIST_DIRECTORY
+                # Remove metadata JSON
+                meta_file = os.path.join(DOCUMENTS_STORE_PATH, f"{st.session_state['doc_id']}.json")
+                if os.path.exists(meta_file):
+                    os.remove(meta_file)
+                # Remove vector store data for this document
+                vector_dir = os.path.join(CHROMA_PERSIST_DIRECTORY, st.session_state['doc_id'])
+                if os.path.exists(vector_dir):
+                    shutil.rmtree(vector_dir, ignore_errors=True)
+                # Clear session state and rerun
                 del st.session_state.doc_id
-                st.rerun()
+                st.experimental_rerun()
 
 if __name__ == "__main__":
     main() 
