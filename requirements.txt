@@ -10,7 +10,11 @@ huggingface-hub
 openai
 tiktoken
 PyMuPDF
-protobuf==3.20.3
+protobuf<=3.20.3
+pysqlite3-binary
 duckdb
 hnswlib
-pysqlite3-binary
+unstructured
+unstructured-client
+langchain-text-splitters
+cohere

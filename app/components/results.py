@@ -79,8 +79,14 @@ def render_results(results):
                 speaker_display = speaker_name
                 
             st.markdown("**Speaker:**")
+            
             # Page number
             st.markdown("**Page:**")
+            
+            # Section information
+            if citation.get("section"):
+                st.markdown("**Section:**")
+            
             # Time information (if available)
             if citation.get("time"):
                 st.markdown("**Time:**")
@@ -88,9 +94,15 @@ def render_results(results):
         with col2:
             # Speaker value
             st.markdown(f"{speaker_display}")
+            
             # Page value
             page_num = citation.get("page", "")
             st.markdown(f"{page_num}")
+            
+            # Section value
+            if citation.get("section"):
+                st.markdown(f"{citation['section']}")
+            
             # Time value (if available)
             if citation.get("time"):
                 st.markdown(f"{citation['time']}")
@@ -106,6 +118,10 @@ def render_results(results):
                 st.write(f"**Date:** {doc_info['date']}")
             if doc_info.get("quarter"):
                 st.write(f"**Period:** {doc_info['quarter']}")
+            
+            # Add chunk ID info for debugging
+            if citation.get("chunk_id"):
+                st.write(f"**Chunk ID:** {citation['chunk_id']}")
         
         # Clear document button at the bottom (cleanup metadata and vectorstore)
         if st.button("Clear document", key="clear_doc_button"):

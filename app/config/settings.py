@@ -13,6 +13,10 @@ from dotenv import load_dotenv
 # Load environment variables from .env file if it exists
 load_dotenv()
 
+# Unstructured API settings
+UNSTRUCTURED_API_KEY = os.environ.get("UNSTRUCTURED_API_KEY")
+UNSTRUCTURED_API_URL = os.environ.get("UNSTRUCTURED_API_URL", "https://api.unstructured.io/general/v0/general")
+
 # Check if running on Streamlit Cloud (it sets this environment variable)
 IS_STREAMLIT_CLOUD = os.environ.get('STREAMLIT_SHARING_MODE') == 'streamlit'
 
@@ -43,5 +47,11 @@ if DEFAULT_LLM_TYPE not in ["openai", "huggingface"]:
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 HUGGINGFACE_API_KEY = os.environ.get("HUGGINGFACE_API_KEY")
 
-# Embedding model settings
-EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"  # Good balance between quality and speed 
+# Embedding model settings - update to use better model for financial text
+EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"  # Better than MiniLM for financial documents
+
+# Retrieval settings
+USE_HYBRID_SEARCH = True  # Enable hybrid (dense + sparse) search
+TOP_K_DOCUMENTS = 8  # Default number of documents to retrieve
+RERANK_DOCUMENTS = True  # Whether to apply reranking 
+COHERE_API_KEY = os.environ.get("COHERE_API_KEY")  # For reranking 
