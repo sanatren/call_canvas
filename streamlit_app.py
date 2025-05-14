@@ -14,6 +14,7 @@ from app.core.query_engine import QueryEngine
 from app.components.sidebar import render_sidebar
 from app.components.results import render_results
 from app.utils.file_utils import save_uploaded_file
+from app.utils.cleanup_utils import clean_document_data
 
 # Ensure static directory exists
 static_dir = os.path.join(os.path.dirname(__file__), "app", "static")
@@ -31,6 +32,22 @@ st.set_page_config(
     }
 )
 
+# Initialize app state
+def init_app_state():
+    """Initialize app state and optionally clean up old data."""
+    # Check if we should clean up on startup
+    # Set this to False in production
+    CLEAN_ON_STARTUP = False
+    
+    # First-time initialization flag
+    if 'initialized' not in st.session_state:
+        st.session_state.initialized = True
+        
+        # Clear any stale data on startup
+        if CLEAN_ON_STARTUP:
+            clean_document_data()
+            # Don't show a message as it would appear every time
+
 # Load CSS
 def load_css():
     css_file = os.path.join(os.path.dirname(__file__), "app", "static", "style.css")
@@ -39,6 +56,9 @@ def load_css():
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 def main():
+    # Initialize app state
+    init_app_state()
+    
     # Load CSS
     load_css()
     
@@ -106,16 +126,15 @@ def main():
         # Add button to clear current document
         if st.button("Clear document", key="clear_doc"):
             if 'doc_id' in st.session_state:
-                import os, shutil
-                from app.config.settings import DOCUMENTS_STORE_PATH, CHROMA_PERSIST_DIRECTORY
-                # Remove metadata JSON
-                meta_file = os.path.join(DOCUMENTS_STORE_PATH, f"{st.session_state['doc_id']}.json")
-                if os.path.exists(meta_file):
-                    os.remove(meta_file)
-                # Remove vector store data for this document
-                vector_dir = os.path.join(CHROMA_PERSIST_DIRECTORY, st.session_state['doc_id'])
-                if os.path.exists(vector_dir):
-                    shutil.rmtree(vector_dir, ignore_errors=True)
+                doc_id = st.session_state['doc_id']
+                # Use the new cleanup utility
+                success = clean_document_data(doc_id)
+                
+                if success:
+                    st.success("Document cleared successfully!")
+                else:
+                    st.warning("Some document data may not have been fully cleared")
+                    
                 # Clear session state and rerun
                 del st.session_state.doc_id
                 st.rerun()

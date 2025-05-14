@@ -1,3 +1,72 @@
-./env
-/env
-/.env
+# Environment variables and API keys
+.env
+.streamlit/secrets.toml
+
+# Local data storage
+data/
+*/data/
+tmp/
+*/tmp/
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Chroma DB and vector store files
+.chroma/
+vectorstore/
+**/vectorstore/
+**/chroma_db/
+**/chromadb/
+
+# Temporary files
+*.tmp
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Large binary files
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx

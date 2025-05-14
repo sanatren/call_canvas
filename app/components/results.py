@@ -1,4 +1,5 @@
 import streamlit as st
+from app.utils.cleanup_utils import clean_document_data
 
 def render_results(results):
     """
@@ -126,13 +127,15 @@ def render_results(results):
         # Clear document button at the bottom (cleanup metadata and vectorstore)
         if st.button("Clear document", key="clear_doc_button"):
             if 'doc_id' in st.session_state:
-                import os
-                from app.config.settings import DOCUMENTS_STORE_PATH
-                # Remove metadata JSON
-                meta_file = os.path.join(DOCUMENTS_STORE_PATH, f"{st.session_state['doc_id']}.json")
-                if os.path.exists(meta_file):
-                    os.remove(meta_file)
-                # Vector store data is in-memory, so no need to clean up files
+                doc_id = st.session_state['doc_id']
+                # Use the new cleanup utility
+                success = clean_document_data(doc_id)
+                
+                if success:
+                    st.success("Document cleared successfully")
+                else:
+                    st.warning("Some document data may not have been fully cleared")
+                
                 # Clear session state and rerun
                 del st.session_state.doc_id
                 st.rerun()

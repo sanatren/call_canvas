@@ -1,116 +1,110 @@
 # CallCanvas
 
-AI-powered earnings call insights - Extract valuable information from earnings call transcripts using state-of-the-art RAG techniques.
+CallCanvas is an AI-powered tool that helps you extract insights from earnings call transcripts. Upload a transcript PDF and ask questions in natural language to get targeted information about company performance, strategy, and outlook.
 
-## Overview
+![CallCanvas Screenshot](app/static/screenshot.png)
 
-CallCanvas is a Streamlit application that uses advanced Retrieval-Augmented Generation (RAG) techniques to extract and analyze information from earnings call transcripts. It allows you to:
+## Features
 
-1. Upload PDF transcripts
-2. Ask natural language questions
-3. Get concise, cited answers with page references
-4. View the original quotes from the transcript
+- 📊 Process and analyze earnings call transcripts with AI
+- 💬 Ask natural language questions about the content
+- 🔍 Get precise answers with source citations and speaker attribution
+- 📱 Clean, modern UI designed for ease of use
+- 🚀 Leverages a hybrid search system (dense embeddings + BM25)
 
-## Architecture
+## Deployment
 
-CallCanvas implements a robust, modern RAG pipeline:
+### Running Locally
 
-### 1. Document Processing
-- Uses [Unstructured](https://unstructured.io) with hi-res strategy to extract structured elements (paragraphs, tables, etc.)
-- Preserves page numbers, speaker information, and section structure
-- Intelligently groups content by speaker to maintain context
+1. Clone this repository:
+   ```
+   git clone https://github.com/yourusername/call_canvas.git
+   cd call_canvas
+   ```
 
-### 2. Hierarchical Chunking
-- Primary splitting by logical blocks (speaker turns, tables, etc.)
-- Secondary splitting by tokens (150 tokens, 20-token overlap)
-- Preserves metadata across chunks for accurate citation
-
-### 3. Hybrid Retrieval
-- [BGE-base-en-v1.5](https://huggingface.co/BAAI/bge-base-en-v1.5) dense embeddings (optimized for financial text)
-- BM25 sparse retrieval
-- Linear combination of both scores (80% dense, 20% sparse)
-- Optional reranking with Cohere Rerank
-
-### 4. LLM Answer Generation
-- Supports OpenAI and Hugging Face models
-- Structured prompting for citations
-- Chunk IDs for precise source identification
-
-## Setup
-
-1. Clone this repository
 2. Install dependencies:
    ```
    pip install -r requirements.txt
    ```
-3. Create a `.env` file with API keys:
+
+3. Set up environment variables (create a `.env` file):
    ```
-   OPENAI_API_KEY=your-openai-api-key
-   UNSTRUCTURED_API_KEY=your-unstructured-api-key
-   COHERE_API_KEY=your-cohere-api-key  # Optional for reranking
+   OPENAI_API_KEY=your_openai_api_key
+   UNSTRUCTURED_API_KEY=your_unstructured_api_key
+   DEFAULT_LLM_TYPE=openai
    ```
-4. Run the application:
+
+4. Run the app:
    ```
    streamlit run streamlit_app.py
    ```
 
-## Features
+### Deploying to Streamlit Cloud
 
-- **Hi-fidelity Parsing**: Accurately extracts text, tables, and structure from PDF transcripts
-- **Accurate Citations**: Points to exact pages and speakers in the transcript
-- **Hybrid Search**: Combines keyword and semantic search for better retrieval
-- **Optimized for Earnings Calls**: Specialized for financial transcript formats and terminology
+1. Push your code to GitHub:
+   ```
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git branch -M main
+   git remote add origin https://github.com/yourusername/call_canvas.git
+   git push -u origin main
+   ```
 
-## Requirements
+2. Go to [Streamlit Cloud](https://streamlit.io/cloud) and sign in with your GitHub account.
 
-- Python 3.8+
-- API keys for:
-  - OpenAI or HuggingFace (for LLM)
-  - Unstructured.io (for document processing)
-  - Cohere (optional, for reranking)
+3. Select "New app" and choose your repository.
 
-## Deployment
+4. Configure the app:
+   - Main file path: `streamlit_app.py`
+   - Add the environment variables from above
 
-CallCanvas can be deployed on Streamlit Cloud or any platform that supports Streamlit applications.
+5. Deploy and enjoy!
 
-## Project Structure
+## Environment Variables
 
-```
-.
-├── app.py                  # Main Streamlit application
-├── app/
-│   ├── core/               # Core application logic
-│   │   ├── document_processor.py  # PDF processing
-│   │   └── query_engine.py        # Question answering
-│   ├── models/             # LLM models and document schemas
-│   │   ├── document.py     # Document model
-│   │   └── llm.py          # LLM configuration
-│   ├── embeddings/         # Vector embeddings
-│   │   └── embeddings_manager.py  # Embedding generation and storage
-│   ├── retrieval/          # Document retrieval
-│   │   └── retriever.py    # Retrieval logic
-│   ├── utils/              # Utility functions
-│   │   ├── file_utils.py   # File handling utilities
-│   │   └── metadata_extractor.py  # Extract metadata from PDFs
-│   ├── components/         # UI components
-│   │   ├── results.py      # Results display
-│   │   └── sidebar.py      # Sidebar UI
-│   └── config/             # Configuration
-│       └── settings.py     # App settings
-├── data/                   # Data storage (created at runtime)
-└── requirements.txt        # Project dependencies
-```
+Set these in your `.env` file locally or in Streamlit Cloud secrets:
+
+| Variable | Description | Required? |
+|----------|-------------|-----------|
+| `OPENAI_API_KEY` | Your OpenAI API key | Yes |
+| `UNSTRUCTURED_API_KEY` | Your Unstructured.io API key for PDF parsing | Yes |
+| `DEFAULT_LLM_TYPE` | LLM provider - `openai` or `huggingface` | No (default: openai) |
+| `HUGGINGFACE_API_KEY` | Your HuggingFace API key (if using HF models) | Only if `DEFAULT_LLM_TYPE=huggingface` |
+| `COHERE_API_KEY` | Your Cohere API key (if using reranking) | No |
 
 ## Usage
 
-1. Upload an earnings call PDF through the interface
-2. Ask questions about the earnings call in natural language
-3. View the results with citations and speaker attribution
+1. Upload an earnings call transcript PDF (usually available on company investor relations websites)
+2. Wait for processing (this might take a minute or two depending on the document size)
+3. Ask questions about the call (e.g., "What was the revenue growth in Q3?", "What's the company's outlook for next year?")
+4. Get answers with source quotes and speaker attribution
+5. Use the "Clear document" button when you want to upload a new transcript
 
-## Extending the Project
+## Data Handling
 
-- Add support for more document types (PPTX, DOCX)
-- Implement advanced speaker detection
-- Add sentiment analysis
-- Support multiple concurrent documents
-- Enable document comparison
+All data is processed and stored temporarily. When you click "Clear document", all associated data is removed including:
+- Document metadata
+- Vector embeddings
+- Uploaded files
+- Temporary processing files
+
+## Technical Details
+
+CallCanvas uses:
+- **Streamlit** for the user interface
+- **LangChain** for orchestration
+- **Unstructured.io** for high-quality PDF extraction
+- **ChromaDB** for vector storage
+- **OpenAI API** (or HuggingFace) for answer generation
+- **BAAI/bge-base-en-v1.5** for embedding generation
+
+The app features a hybrid search system combining dense vector embeddings with BM25 for improved retrieval.
+
+## Debugging
+
+If you encounter any issues:
+- Check that your API keys are correctly set
+- Ensure you have sufficient API credits
+- For OpenAI users, check your usage limits
+- For Streamlit Cloud, make sure to select a higher memory instance if processing large documents
