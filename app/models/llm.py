@@ -38,7 +38,7 @@ def _get_openai_llm() -> LLM:
     
     # Configure the LLM with parameters optimized for our use case
     return ChatOpenAI(
-        model_name="gpt-4", 
+        model_name="gpt-4o", 
         temperature=0.1,  # Low temperature for factual responses
         api_key=api_key,
         model_kwargs={

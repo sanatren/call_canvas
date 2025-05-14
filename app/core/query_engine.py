@@ -56,20 +56,15 @@ class QueryEngine:
         # Get results
         try:
             raw_results = qa_chain({"query": query})
-            
             # Extract the answer and source documents
             answer = raw_results.get("result", "")
             source_docs = raw_results.get("source_documents", [])
-            
             # Extract citations from answer
             citations = self._extract_citations_from_text(answer)
-            
             # Clean up the answer
             answer = self._clean_answer(answer)
-            
             # Format the results with proper citations
             results = self._format_results(answer, source_docs, document.metadata, query, citations)
-            
             return results
         except Exception as e:
             logger.error(f"Error generating answer: {e}", exc_info=True)
@@ -109,9 +104,9 @@ Instructions:
 5. Focus on exactly answering the question without adding unnecessary information.
 6. For financial questions about revenue, profit, EBITDA, customer numbers etc., be sure to include the precise numbers with the correct units (crores, millions, billions, etc.)
 7. Always double-check if the information you're about to provide is actually present in the context.
-
-Question: {question}
-
+        
+        Question: {question}
+        
 Answer (include citations):"""
         
         QA_PROMPT = PromptTemplate(
@@ -405,7 +400,7 @@ Answer (include citations):"""
                 return section_name
         
         return ""
-
+    
     def _extract_speaker_from_quote(self, text: str) -> Dict[str, Any]:
         """
         Extract speaker information from quote content.
@@ -584,7 +579,7 @@ Answer (include citations):"""
             for term in financial_terms:
                 if term in norm_sentence:
                     score += 5
-                    
+            
             # Check for query entity matches
             for entity in query_entities:
                 if entity.lower() in norm_sentence:
