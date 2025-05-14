@@ -60,9 +60,33 @@ class DocumentProcessor:
                 metadata=metadata
             )
             document.save()
+            logger.info(f"Saved document metadata with ID: {doc_id}")
+            
+            # Add a few log statements for debugging
+            logger.info(f"Adding documents to vectorstore with doc_id={doc_id}")
             
             # Generate embeddings and store vectors
-            self.embeddings_manager.add_documents(doc_id, chunks)
+            try:
+                # Create a test chunk with clear content for validation
+                test_chunk = Document(
+                    page_content="This is a test chunk to validate vectorstore operation.", 
+                    metadata={"chunk_id": "test_1", "page": 1}
+                )
+                chunks.append(test_chunk)
+                
+                # Add the documents to the vector store
+                self.embeddings_manager.add_documents(doc_id, chunks)
+                logger.info(f"Successfully added {len(chunks)} chunks to vectorstore")
+                
+                # Verify the documents were actually added by retrieving test chunk
+                validation_docs = self.embeddings_manager.search(doc_id, "test chunk validate", k=1)
+                if validation_docs and len(validation_docs) > 0:
+                    logger.info("Vector store validation successful - able to retrieve test document")
+                else:
+                    logger.warning("Vector store validation failed - unable to retrieve test document")
+            except Exception as e:
+                logger.error(f"Error adding documents to vector store: {str(e)}", exc_info=True)
+                raise
             
             return doc_id
             

@@ -53,7 +53,12 @@ class EmbeddingsManager:
         
         # Add documents to the vector store
         vector_store.add_documents(documents)
-        logger.info(f"Added documents to vector store")
+        
+        # Explicitly persist the vector store to ensure data is saved,
+        # especially important for Streamlit Cloud's ephemeral storage
+        vector_store.persist()
+        
+        logger.info(f"Added and persisted documents to vector store")
     
     def search(self, doc_id: str, query: str, k: int = 5) -> List[Document]:
         """
@@ -90,6 +95,18 @@ class EmbeddingsManager:
         # Create dense retriever
         dense_retriever = vector_store.as_retriever(search_kwargs=search_kwargs)
         
+        # Before attempting hybrid search, ensure the vector store has documents
+        # This can help with Streamlit Cloud issues where the collection might exist but have no data
+        try:
+            # Try to get documents to verify the collection has data
+            collection_data = vector_store.get()
+            if not collection_data or not collection_data.get("documents"):
+                logger.warning(f"Collection {doc_id} exists but has no documents. Using dense retriever only.")
+                return dense_retriever
+        except Exception as e:
+            logger.warning(f"Error checking collection data: {e}")
+            # Continue with normal flow
+            
         if not USE_HYBRID_SEARCH:
             return dense_retriever
         
@@ -152,9 +169,30 @@ class EmbeddingsManager:
             Chroma vector store
         """
         # With pysqlite3 fix, we can now use persistent storage
-        vector_store = Chroma(
-            collection_name=collection_name,
-            embedding_function=self.embeddings,
-            persist_directory=CHROMA_PERSIST_DIRECTORY
-        )
-        return vector_store
+        persist_dir = os.path.join(CHROMA_PERSIST_DIRECTORY, collection_name)
+        
+        # Ensure collection directory exists
+        os.makedirs(persist_dir, exist_ok=True)
+        
+        # Log more information about the vector store
+        logger.info(f"Using ChromaDB with persistence directory: {persist_dir}")
+        
+        try:
+            # Create/get vector store with specific collection persistence
+            vector_store = Chroma(
+                collection_name=collection_name,
+                embedding_function=self.embeddings,
+                persist_directory=persist_dir
+            )
+            
+            return vector_store
+        except Exception as e:
+            logger.error(f"Error creating/accessing vector store: {e}")
+            # Fallback to shared persistence directory
+            logger.warning(f"Falling back to shared persistence directory: {CHROMA_PERSIST_DIRECTORY}")
+            vector_store = Chroma(
+                collection_name=collection_name,
+                embedding_function=self.embeddings,
+                persist_directory=CHROMA_PERSIST_DIRECTORY
+            )
+            return vector_store

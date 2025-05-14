@@ -107,6 +107,8 @@ Instructions:
 3. If the answer isn't in the context, say "I don't have enough information to answer this question."
 4. Include exact numbers, percentages, and figures when relevant.
 5. Focus on exactly answering the question without adding unnecessary information.
+6. For financial questions about revenue, profit, EBITDA, customer numbers etc., be sure to include the precise numbers with the correct units (crores, millions, billions, etc.)
+7. Always double-check if the information you're about to provide is actually present in the context.
 
 Question: {question}
 
