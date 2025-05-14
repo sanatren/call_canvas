@@ -1,13 +1,13 @@
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 import re
 import logging
 import math
 
 import streamlit as st
 from langchain.chains.question_answering import load_qa_chain
-from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document
+from langchain.chains import RetrievalQA
 
 from app.models.document import Document as DocModel
 from app.embeddings.embeddings_manager import EmbeddingsManager
@@ -55,6 +55,7 @@ class QueryEngine:
         
         # Get results
         try:
+            # Use __call__ method for compatibility with older versions
             raw_results = qa_chain({"query": query})
             # Extract the answer and source documents
             answer = raw_results.get("result", "")

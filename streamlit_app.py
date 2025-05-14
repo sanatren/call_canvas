@@ -84,7 +84,7 @@ def main():
         # File upload section when no document is loaded
         st.title("CallCanvas")
         st.subheader("Upload a transcript (PDF, max 10MB)")
-        uploaded_file = st.file_uploader("", type=['pdf'], label_visibility="collapsed")
+        uploaded_file = st.file_uploader("Upload PDF file", type=['pdf'], label_visibility="collapsed")
         
         if uploaded_file:
             with st.spinner("Processing document..."):
@@ -107,7 +107,7 @@ def main():
         
         # Query input
         query = st.text_input(
-            "", 
+            "Question", 
             placeholder="e.g., Who built Jio's 4G and 5G network?",
             key="question_input",
             label_visibility="collapsed"

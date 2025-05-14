@@ -5,7 +5,12 @@ import logging
 from langchain.schema import Document
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.retrievers import BM25Retriever
+try:
+    from langchain_community.retrievers import BM25Retriever
+    BM25_AVAILABLE = True
+except ImportError:
+    BM25_AVAILABLE = False
+    
 from langchain.retrievers import EnsembleRetriever
 
 from app.config.settings import (
@@ -54,11 +59,9 @@ class EmbeddingsManager:
         # Add documents to the vector store
         vector_store.add_documents(documents)
         
-        # Explicitly persist the vector store to ensure data is saved,
-        # especially important for Streamlit Cloud's ephemeral storage
-        vector_store.persist()
-        
-        logger.info(f"Added and persisted documents to vector store")
+        # No need to explicitly call persist() with newer Chroma versions
+        # as mentioned in the warning, docs are automatically persisted
+        logger.info(f"Added documents to vector store")
     
     def search(self, doc_id: str, query: str, k: int = 5) -> List[Document]:
         """
@@ -73,6 +76,7 @@ class EmbeddingsManager:
             List of relevant documents
         """
         retriever = self.get_retriever(doc_id, {"k": k})
+        # Use get_relevant_documents for compatibility with older versions
         return retriever.get_relevant_documents(query)
     
     def get_retriever(self, doc_id: str, search_kwargs: Optional[Dict[str, Any]] = None) -> Any:
@@ -107,7 +111,10 @@ class EmbeddingsManager:
             logger.warning(f"Error checking collection data: {e}")
             # Continue with normal flow
             
-        if not USE_HYBRID_SEARCH:
+        if not USE_HYBRID_SEARCH or not BM25_AVAILABLE:
+            # If hybrid search is disabled or BM25 is not available, return dense retriever
+            if not BM25_AVAILABLE and USE_HYBRID_SEARCH:
+                logger.warning("BM25Retriever not available. Install with `pip install rank_bm25`. Using dense retriever only.")
             return dense_retriever
         
         try:

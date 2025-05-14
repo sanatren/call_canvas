@@ -18,3 +18,4 @@ unstructured
 unstructured-client
 langchain-text-splitters
 cohere
+rank-bm25
