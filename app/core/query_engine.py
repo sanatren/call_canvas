@@ -85,8 +85,14 @@ class QueryEngine:
         words = len(query.split())
         k = math.ceil(words / 12) + 2  # 1 doc per ~12 words plus buffer
         
+        # If the query contains numeric data or ARPU, increase k for better context
+        lower_q = query.lower()
+        if re.search(r"\d", lower_q) or "arpu" in lower_q:
+            logger.info(f"Numeric or ARPU query detected, using full TOP_K_DOCUMENTS={TOP_K_DOCUMENTS}")
+            return TOP_K_DOCUMENTS
+        
         # Limit to reasonable range
-        return max(3, min(k, 10))
+        return max(3, min(k, TOP_K_DOCUMENTS))
     
     def _create_qa_chain_with_citations(self, retriever):
         """Create a QA chain that includes citations in the output."""
@@ -355,7 +361,7 @@ Answer (include citations):"""
         if financial_matches:
             financial_terms = financial_matches
         
-        # Extract words that would be significant
+ # Extract words that would be significant
         words = re.findall(r'\b[a-z]{3,}\b', text)
         
         # Filter common words
