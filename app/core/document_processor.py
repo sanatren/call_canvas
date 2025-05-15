@@ -127,7 +127,7 @@ class DocumentProcessor:
                     metadata=metadata
                 ))
                 continue
-                
+            
             # Split the document content into chunks
             chunks = text_splitter.split_text(doc.page_content)
             

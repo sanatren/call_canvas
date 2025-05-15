@@ -119,7 +119,7 @@ def render_results(results):
                 st.write(f"**Date:** {doc_info['date']}")
             if doc_info.get("quarter"):
                 st.write(f"**Period:** {doc_info['quarter']}")
-            
+        
             # Add chunk ID info for debugging
             if citation.get("chunk_id"):
                 st.write(f"**Chunk ID:** {citation['chunk_id']}")

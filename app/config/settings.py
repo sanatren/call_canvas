@@ -13,6 +13,9 @@ from dotenv import load_dotenv
 # Load environment variables from .env file if it exists
 load_dotenv()
 
+# Set tokenizer parallelism to false to avoid warnings in forked processes
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 # Unstructured API settings
 UNSTRUCTURED_API_KEY = os.environ.get("UNSTRUCTURED_API_KEY")
 UNSTRUCTURED_API_URL = os.environ.get("UNSTRUCTURED_API_URL", "https://api.unstructured.io/general/v0/general")

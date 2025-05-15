@@ -35,11 +35,18 @@ class EmbeddingsManager:
             self.embeddings = HuggingFaceEmbeddings(
                 model_name=EMBEDDING_MODEL,
                 model_kwargs={"device": "cpu"},
-                encode_kwargs={"device": "cpu", "normalize_embeddings": True}
+                encode_kwargs={
+                    "normalize_embeddings": True,
+                    "batch_size": 32
+                }
             )
         except Exception as e:
             logger.warning(f"Failed to initialize embeddings with custom settings: {e}")
-            self.embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+            # Fallback to basic initialization
+            self.embeddings = HuggingFaceEmbeddings(
+                model_name=EMBEDDING_MODEL,
+                model_kwargs={"device": "cpu"}
+            )
         
         # Ensure persistence directory exists
         os.makedirs(CHROMA_PERSIST_DIRECTORY, exist_ok=True)
@@ -197,9 +204,9 @@ class EmbeddingsManager:
             logger.error(f"Error creating/accessing vector store: {e}")
             # Fallback to shared persistence directory
             logger.warning(f"Falling back to shared persistence directory: {CHROMA_PERSIST_DIRECTORY}")
-            vector_store = Chroma(
-                collection_name=collection_name,
-                embedding_function=self.embeddings,
-                persist_directory=CHROMA_PERSIST_DIRECTORY
-            )
-            return vector_store
+        vector_store = Chroma(
+            collection_name=collection_name,
+            embedding_function=self.embeddings,
+            persist_directory=CHROMA_PERSIST_DIRECTORY
+        )
+        return vector_store 
