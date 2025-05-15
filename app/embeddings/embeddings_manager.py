@@ -66,6 +66,13 @@ class EmbeddingsManager:
         # Add documents to the vector store
         vector_store.add_documents(documents)
         
+        # Ensure vectors are persisted to disk
+        try:
+            vector_store.persist()
+            logger.info(f"Persisted vector store for {doc_id}")
+        except Exception as e:
+            logger.warning(f"Unable to persist vector store for {doc_id}: {e}")
+        
         # No need to explicitly call persist() with newer Chroma versions
         # as mentioned in the warning, docs are automatically persisted
         logger.info(f"Added documents to vector store")
